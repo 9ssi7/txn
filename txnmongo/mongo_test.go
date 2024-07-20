@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/integration/mtest"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -28,7 +27,7 @@ func TestMongoTxn_Add(t *testing.T) {
 	client := mt.Client
 	txn := New(client)
 
-	txn.Add(func(sc mongo.SessionContext) error { return nil })
+	txn.Add(func(sc Txr) error { return nil })
 
 	if len(txn.(*mongoTxn).cbs) != 1 {
 		t.Fatal("Add did not append callback")
@@ -41,8 +40,9 @@ func TestMongoTxn_Transaction_Success(t *testing.T) {
 	mt.AddMockResponses(mtest.CreateSuccessResponse(), mtest.CreateSuccessResponse())
 	client := mt.Client
 	txn := New(client)
-	txn.Add(func(sc mongo.SessionContext) error {
-		_, err := sc.Client().Database("test").Collection("test").InsertOne(sc, bson.E{Key: "x", Value: 1})
+	col := client.Database("test").Collection("test")
+	txn.Add(func(sc Txr) error {
+		_, err := col.InsertOne(sc, bson.E{Key: "x", Value: 1})
 		return err
 	})
 
@@ -59,7 +59,7 @@ func TestMongoTxn_Transaction_CallbackError(t *testing.T) {
 	client := mt.Client
 	txn := New(client)
 
-	txn.Add(func(sc mongo.SessionContext) error {
+	txn.Add(func(sc Txr) error {
 		return errors.New("Callback error")
 	})
 
@@ -77,8 +77,9 @@ func TestMongoTxn_Transaction_CommitError(t *testing.T) {
 	}))
 	client := mt.Client
 	txn := New(client)
-	txn.Add(func(sc mongo.SessionContext) error {
-		_, err := sc.Client().Database("test").Collection("test").InsertOne(sc, bson.E{Key: "x", Value: 1})
+	col := client.Database("test").Collection("test")
+	txn.Add(func(sc Txr) error {
+		_, err := col.InsertOne(sc, bson.E{Key: "x", Value: 1})
 		return err
 	})
 
@@ -107,9 +108,10 @@ func TestMongoTxn_Transaction_StartError(t *testing.T) {
 		Snapshot:          &bl,
 		CausalConsistency: &bla,
 	})
+	col := client.Database("test").Collection("test")
 
-	txn.Add(func(sc mongo.SessionContext) error {
-		_, err := sc.Client().Database("test").Collection("test").InsertOne(sc, bson.E{Key: "x", Value: 1})
+	txn.Add(func(sc Txr) error {
+		_, err := col.InsertOne(sc, bson.E{Key: "x", Value: 1})
 		return err
 	})
 

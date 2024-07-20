@@ -32,6 +32,7 @@ This example in the `examples` directory demonstrates how to use the `txn` packa
 Included examples:
 
 - [`Basic Gorm Example`](examples/basic-gorm/main.go): Demonstrates basic usage of the `txn` package with GORM.
+- [`Basic Mongo Example`](examples/basic-mongo/main.go): Demonstrates basic usage of the `txn` package with MongoDB.
 
 ## Contributing
 
