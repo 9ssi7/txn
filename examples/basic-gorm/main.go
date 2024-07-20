@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type Repo[Txr any] interface {
+type Repo[Txr txn.ITxr] interface {
 	txn.Repo[Txr]
 	Select(ctx context.Context) error
 }
@@ -45,7 +45,7 @@ func main() {
 	runGenericService(context.Background(), txn, repo)
 }
 
-func runGenericService[Txr any](ctx context.Context, txn txn.Txn[Txr], repo Repo[Txr]) {
+func runGenericService[Txr txn.ITxr](ctx context.Context, txn txn.Txn[Txr], repo Repo[Txr]) {
 	txn.Add(func(d Txr) error {
 		repo.WithTxn(d)
 		return repo.Select(ctx)

@@ -9,7 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type Repo[Txr any] interface {
+type Repo[Txr txn.ITxr] interface {
 	txn.Repo[Txr]
 	Insert(ctx context.Context, id string) error
 }
@@ -34,7 +34,7 @@ func (r *customRepo) Insert(ctx context.Context, id string) error {
 	return r.collection.FindOne(r.Repo.GetCurrent(ctx), custom{ID: id}).Err()
 }
 
-func runGenericService[Txr any](ctx context.Context, txn txn.Txn[Txr], repo Repo[Txr]) {
+func runGenericService[Txr txn.ITxr](ctx context.Context, txn txn.Txn[Txr], repo Repo[Txr]) {
 	txn.Add(func(d Txr) error {
 		repo.WithTxn(d)
 		return repo.Insert(ctx, "1")

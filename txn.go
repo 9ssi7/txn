@@ -4,7 +4,15 @@ import (
 	"context"
 )
 
-type Repo[Txr any] interface {
+// Txr is an interface that represents a transaction.
+// It provides methods to add a transactional operation and to commit the transaction.
+//
+// For example, the adapter when gorm is used, Txr is *gorm.DB.
+//
+// For example, the adapter when mongo is used, Txr is mongo.SessionContext.
+type ITxr any
+
+type Repo[Txr ITxr] interface {
 	WithTxn(txr Txr)
 	GetCurrent(ctx context.Context) Txr
 	ClearTxn()
@@ -13,11 +21,11 @@ type Repo[Txr any] interface {
 // Callback is a function type that accepts a database connection and returns an error.
 // It is used to add a transactional operation to a transaction.
 // The operation will be executed when the transaction is committed.
-type Callback[Txr any] func(Txr) error
+type Callback[Txr ITxr] func(Txr) error
 
 // Txn is an interface that represents a transaction.
 // It provides methods to add a transactional operation and to commit the transaction.
-type Txn[Txr any] interface {
+type Txn[Txr ITxr] interface {
 
 	// Add adds a transactional operation to the transaction.
 	// The operation will be executed when the transaction is committed.
