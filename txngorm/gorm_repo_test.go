@@ -1,6 +1,7 @@
 package txngorm
 
 import (
+	"context"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -21,25 +22,25 @@ func TestTxnRepo_NewTxnRepo(t *testing.T) {
 	db := getMockDB()
 	repo := NewTxnRepo(db)
 	assert.NotNil(t, repo)
-	assert.Equal(t, db, repo.GetCurrentDB())
+	assert.NotEqual(t, db, repo.GetCurrent(context.Background()))
 }
 
 func TestTxnRepo_WithTxn(t *testing.T) {
 	db := getMockDB()
 	repo := NewTxnRepo(db)
 	repo.WithTxn(db)
-	assert.Equal(t, db, repo.GetCurrentDB())
+	assert.Equal(t, db, repo.GetCurrent(context.Background()))
 }
 
 func TestTxnRepo_GetCurrentDB(t *testing.T) {
 	db := getMockDB()
 	repo := NewTxnRepo(db)
 	repo.WithTxn(db)
-	assert.Equal(t, db, repo.GetCurrentDB())
+	assert.Equal(t, db, repo.GetCurrent(context.Background()))
 
 	// Test without transaction
 	repo.ClearTxn()
-	assert.Equal(t, db, repo.GetCurrentDB())
+	assert.NotEqual(t, db, repo.GetCurrent(context.Background()))
 }
 
 func TestTxnRepo_ClearTxn(t *testing.T) {
@@ -50,5 +51,5 @@ func TestTxnRepo_ClearTxn(t *testing.T) {
 	repo.WithTxn(db)
 	repo.ClearTxn()
 	assert.Nil(t, repo.tx)
-	assert.Equal(t, db, repo.GetCurrentDB())
+	assert.NotEqual(t, db, repo.GetCurrent(context.Background()))
 }

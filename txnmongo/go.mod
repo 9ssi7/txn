@@ -1,4 +1,4 @@
-module github.com/9ssi7/txn/mongo-adapter
+module github.com/9ssi7/txnmongo
 
 go 1.22.0
 

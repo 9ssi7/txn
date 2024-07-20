@@ -1,4 +1,4 @@
-// Copyright 2024 The txngorm Authors
+// Copyright 2024 The txnmongo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,27 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package txngorm provides a transaction (Tx) management adapter designed
-// to be used with Go's popular ORM library, GORM. This package implements
-// the generic transaction interface (Txn) from the 9ssi7/txn package, leveraging
-// GORM's transaction capabilities.
+// Package txnmongo provides a transaction management adapter designed to be used
+// with the official MongoDB Go driver. This package implements the generic
+// transaction interface (Txn) from the 9ssi7/txn package, leveraging MongoDB's
+// transaction capabilities.
 //
 // Standard usage:
 //
-//		db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+//		client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb://localhost:27017"))
 //		if err != nil {
-//		    panic("failed to connect database")
+//		    panic(err)
 //		}
 //
-//		txManager := txngorm.NewGorm(db)
+//		txManager := txnmongo.NewMongo(client)
 //
-//		repo := sample.NewCustomRepo(db)
-//		txManager.Add(func(txDB *gorm.DB) error {
-//		    repo.WithTxn(txDB)
-//		    return repo.GetById("some_id")
+//		repo := sample.NewCustomRepo(client)
+//		txManager.Add(func(sc mongo.SessionContext) error {
+//		    repo.WithTxn(sc)
+//		    return repo.GetById(context.Background(), "some_id")
 //		})
 //		if err := txManager.Transaction(context.Background()); err != nil {
 //	     	repo.ClearTxn()
 //		    log.Fatalf("Error: %v", err)
 //		}
-package txngorm
+package txnmongo

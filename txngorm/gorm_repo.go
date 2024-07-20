@@ -1,6 +1,8 @@
 package txngorm
 
 import (
+	"context"
+
 	"github.com/9ssi7/txn"
 	"gorm.io/gorm"
 )
@@ -22,11 +24,11 @@ func (r *txnRepo) WithTxn(db *gorm.DB) {
 	r.tx = db
 }
 
-func (r *txnRepo) GetCurrentDB() *gorm.DB {
+func (r *txnRepo) GetCurrent(ctx context.Context) *gorm.DB {
 	if r.tx != nil {
 		return r.tx
 	}
-	return r.db
+	return r.db.WithContext(ctx)
 }
 
 func (r *txnRepo) ClearTxn() {
