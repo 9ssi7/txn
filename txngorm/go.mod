@@ -2,10 +2,8 @@ module github.com/9ssi7/txn/txngorm
 
 go 1.22.0
 
-replace github.com/9ssi7/txn => ../
-
 require (
-	github.com/9ssi7/txn v0.0.0-00010101000000-000000000000
+	github.com/9ssi7/txn v0.0.1-beta.7
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/stretchr/testify v1.8.1
 	gorm.io/driver/postgres v1.5.9

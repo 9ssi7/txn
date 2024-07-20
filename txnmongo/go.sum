@@ -1,3 +1,5 @@
+github.com/9ssi7/txn v0.0.1-beta.7 h1:l0tw+xfN6cxN1hSokYTVNlvk55HIAX/0eGP2/krtB1Y=
+github.com/9ssi7/txn v0.0.1-beta.7/go.mod h1:2c+CkwFU49XlJeNkamRBp0HQhsLDpXt+/kvaPJkgQ10=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/golang/snappy v0.0.4 h1:yAGX7huGHXlcLOEtBnF4w7FQwA26wojNCwOYAEhLjQM=

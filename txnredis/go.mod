@@ -2,10 +2,8 @@ module github.com/9ssi7/txn/txnredis
 
 go 1.22.0
 
-replace github.com/9ssi7/txn => ../
-
 require (
-	github.com/9ssi7/txn v0.0.0-00010101000000-000000000000
+	github.com/9ssi7/txn v0.0.1-beta.7
 	github.com/go-redis/redismock/v9 v9.2.0
 	github.com/redis/go-redis/v9 v9.6.0
 	github.com/stretchr/testify v1.9.0
