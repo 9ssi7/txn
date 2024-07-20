@@ -155,3 +155,22 @@ func TestEnd_NoSession(t *testing.T) {
 	// Calling End with no session should not panic
 	assert.NotPanics(t, func() { adapter.End(context.Background()) })
 }
+
+func TestGetCurrent(t *testing.T) {
+	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock).ShareClient(true))
+
+	// Mock session end
+	mt.AddMockResponses(mtest.CreateSuccessResponse())
+	adapter := &mongoAdapter{
+		client: mt.Client,
+	}
+
+	adapter.Begin(context.Background())
+
+	assert.Equal(t, adapter.sessCtx, adapter.GetCurrent(context.Background()))
+
+	adapter.End(context.Background())
+
+	ctx := context.Background()
+	assert.Equal(t, ctx, adapter.GetCurrent(ctx))
+}

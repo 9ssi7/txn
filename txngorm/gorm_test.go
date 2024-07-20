@@ -223,3 +223,29 @@ func TestEnd(t *testing.T) {
 	adapter.End(context.Background())
 	assert.Nil(t, adapter.tx)
 }
+
+func TestGetCurrent(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	gormDB, err := gorm.Open(postgres.New(postgres.Config{
+		Conn: db,
+	}), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	adapter := &gormAdapter{db: gormDB}
+
+	mock.ExpectBegin()
+
+	assert.Equal(t, gormDB, adapter.GetCurrent(context.Background()))
+
+	err = adapter.Begin(context.Background())
+	assert.Nil(t, err)
+
+	assert.Equal(t, adapter.tx, adapter.GetCurrent(context.Background()))
+	assert.NotEqual(t, gormDB, adapter.GetCurrent(context.Background()))
+}

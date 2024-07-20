@@ -7,13 +7,24 @@ import (
 	"gorm.io/gorm"
 )
 
+// GAdapter is the interface for interacting with GORM within a transaction.
+// It extends the txn.Adapter interface to provide additional GORM-specific functionality.
+type GAdapter interface {
+	txn.Adapter
+
+	// GetCurrent returns the current *gorm.DB instance to use for executing GORM operations.
+	// Depending on the transaction state, this may be the original db instance or a transaction object.
+	GetCurrent(ctx context.Context) *gorm.DB
+}
+
+// New creates a new GAdapter instance using the provided *gorm.DB.
+func New(db *gorm.DB) GAdapter {
+	return &gormAdapter{db: db}
+}
+
 type gormAdapter struct {
 	db *gorm.DB
 	tx *gorm.DB
-}
-
-func New(db *gorm.DB) txn.Adapter {
-	return &gormAdapter{db: db}
 }
 
 func (a *gormAdapter) Begin(ctx context.Context) error {
@@ -47,4 +58,11 @@ func (a *gormAdapter) End(_ context.Context) {
 	if a.tx != nil {
 		a.tx = nil
 	}
+}
+
+func (a *gormAdapter) GetCurrent(ctx context.Context) *gorm.DB {
+	if a.tx != nil {
+		return a.tx
+	}
+	return a.db
 }

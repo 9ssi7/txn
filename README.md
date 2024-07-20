@@ -1,15 +1,16 @@
-# txn: Generic Transaction Management for Go
+# txn: Generic Distributed Transaction Management for Go
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-The `txn` package provides a powerful and flexible framework for managing database transactions in your Go applications. By harnessing the capabilities of Go generics, `txn` enables a clean, database-agnostic approach to transaction handling, making it a perfect fit for modern architectures like Clean Architecture and Hexagonal Architecture.
+The `txn` package provides a robust and flexible framework for managing distributed transactions across multiple data sources in your Go applications. By harnessing the power of Go generics, `txn` enables a clean, database-agnostic approach to transaction handling, ensuring data consistency and atomicity even in complex, distributed environments.
 
 ## Key Features
 
-* **Database Independence:** Seamlessly switch between different database technologies (PostgreSQL, MongoDB, etc.) without altering your core business logic.
-* **Clean Architecture:** Maintain a clear separation of concerns, keeping your business logic pristine and decoupled from database-specific implementation details.
-* **Data Consistency:** Ensure data integrity by executing multiple database operations atomically within transactions.
-* **Flexibility:** Easily adapt the `txn` framework to work with various database drivers or ORMs by implementing the provided interfaces.
+* **Distributed Transactions:** Coordinate transactions across multiple data sources seamlessly.
+* **Database Independence:** Work with various databases (PostgreSQL, MongoDB, Redis, etc.) using specialized adapters.
+* **Clean Architecture:** Maintain a clear separation of concerns, keeping your business logic decoupled from data access details.
+* **Atomicity:** Ensure that all operations within a transaction either succeed or fail together, maintaining data integrity.
+* **Flexibility:** Easily extend the framework by creating custom adapters for your specific data sources.
 
 ## Installation
 
@@ -19,20 +20,52 @@ go get github.com/9ssi7/txn
 
 ## Usage
 
-1. **Before Use, Choose a Database Adapter:** Select the appropriate adapter package for your chosen database:
-   * `txngorm`: For GORM (https://github.com/9ssi7/txn/txngorm)
-   * `txnmongo`: For MongoDB (https://github.com/9ssi7/txn/txnmongo)
-   * (Add more adapters as you implement them)
+1. **Create a Tx Instance:**
 
+```go
+tx := txn.New()
+```
 
-## Example (Using txngorm)
+2. **Register Adapters:**
 
-This example in the `examples` directory demonstrates how to use the `txn` package with GORM.
+```go
+gormAdapter := txngorm.New(gormDB)
+tx.Register(gormAdapter)
 
-Included examples:
+mongoAdapter := txnmongo.New(mongoClient)
+tx.Register(mongoAdapter)
 
-- [`Basic Gorm Example`](examples/basic-gorm/main.go): Demonstrates basic usage of the `txn` package with GORM.
-- [`Basic Mongo Example`](examples/basic-mongo/main.go): Demonstrates basic usage of the `txn` package with MongoDB.
+redisAdapter := txnredis.New(redisClient)
+tx.Register(redisAdapter)
+
+// Register more adapters as needed...
+```
+
+3. **Manage Transactions:**
+
+```go
+err := tx.Begin(context.Background())
+if err != nil {
+    // Handle error
+}
+defer tx.End(context.Background()) // Ensure resources are cleaned up
+
+// Perform operations on each data source using their respective adapters
+// ...
+
+if err := tx.Commit(context.Background()); err != nil {
+   tx.Rollback(context.Background())
+    // Handle commit error
+}
+```
+
+## Adapters
+
+The `txn` package supports multiple database adapters:
+
+* **txngorm:** GORM (https://github.com/9ssi7/txngorm)
+* **txnmongo:** MongoDB (https://github.com/9ssi7/txnmongo)
+* **txnredis:** Redis (https://github.com/9ssi7/txnredis)
 
 ## Contributing
 

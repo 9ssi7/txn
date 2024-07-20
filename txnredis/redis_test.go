@@ -60,6 +60,18 @@ func TestEnd(t *testing.T) {
 	adapter := &redisAdapter{db: db, pipe: db.TxPipeline()}
 	adapter.pipe.Set(context.Background(), "key", "value", 0) // Add a command to the pipeline
 
-	adapter.End(context.Background())      // Discard the pipeline
-	assert.Equal(t, 0, adapter.pipe.Len()) // Pipeline should be empty
+	adapter.End(context.Background())  // Discard the pipeline
+	assert.Equal(t, nil, adapter.pipe) // Pipeline should be empty
+}
+
+func TestGetCurrent(t *testing.T) {
+	db, _ := redismock.NewClientMock()
+	pipe := db.TxPipeline()
+	adapter := &redisAdapter{db: db, pipe: pipe}
+	assert.NotNil(t, adapter.GetCurrent(context.Background()))
+
+	assert.Equal(t, pipe, adapter.GetCurrent(context.Background()))
+
+	adapter.End(context.Background())
+	assert.NotNil(t, adapter.GetCurrent(context.Background()))
 }
