@@ -1,40 +1,57 @@
 package txn
 
-import (
-	"context"
-)
+import "context"
 
-// Txr is an interface that represents a transaction.
-// It provides methods to add a transactional operation and to commit the transaction.
-//
-// For example, the adapter when gorm is used, Txr is *gorm.DB.
-//
-// For example, the adapter when mongo is used, Txr is mongo.SessionContext.
-type ITxr any
+type Tx interface {
+	Begin(ctx context.Context) error
+	Commit(ctx context.Context) error
+	Rollback(ctx context.Context) error
+	Cancel(ctx context.Context)
 
-type Repo[Txr ITxr] interface {
-	WithTxn(txr Txr)
-	GetCurrent(ctx context.Context) Txr
-	ClearTxn()
+	Register(Adapter)
 }
 
-// Callback is a function type that accepts a database connection and returns an error.
-// It is used to add a transactional operation to a transaction.
-// The operation will be executed when the transaction is committed.
-type Callback[Txr ITxr] func(Txr) error
+type txn struct {
+	adapters []Adapter
+}
 
-// Txn is an interface that represents a transaction.
-// It provides methods to add a transactional operation and to commit the transaction.
-type Txn[Txr ITxr] interface {
+func New() Tx {
+	return &txn{}
+}
 
-	// Add adds a transactional operation to the transaction.
-	// The operation will be executed when the transaction is committed.
-	// The operation is represented by a callback function that accepts a database connection and returns an error.
-	// The callback function should perform the transactional operation.
-	Add(cb Callback[Txr])
+func (t *txn) Register(a Adapter) {
+	t.adapters = append(t.adapters, a)
+}
 
-	// Transaction commits the transaction.
-	// It executes all the transactional operations that were added to the transaction.
-	// If any of the operations return an error, the transaction is rolled back.
-	Transaction(ctx context.Context) error
+func (t *txn) Cancel(ctx context.Context) {
+	for _, a := range t.adapters {
+		a.Rollback(ctx)
+	}
+}
+
+func (t *txn) Begin(ctx context.Context) error {
+	for _, a := range t.adapters {
+		if err := a.Begin(ctx); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (t *txn) Commit(ctx context.Context) error {
+	for _, a := range t.adapters {
+		if err := a.Commit(ctx); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (t *txn) Rollback(ctx context.Context) error {
+	for _, a := range t.adapters {
+		if err := a.Rollback(ctx); err != nil {
+			return err
+		}
+	}
+	return nil
 }

@@ -6,122 +6,220 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-// Mock Callback for testing
-func mockCallback(db *gorm.DB) error {
-	return db.Exec("SELECT 1").Error // Simulate a simple DB interaction
-}
-
 func TestNew(t *testing.T) {
-	db, _, _ := sqlmock.New()
-	defer db.Close()
-
-	gormDB, _ := gorm.Open(postgres.New(postgres.Config{Conn: db}), &gorm.Config{})
-	txn := New(gormDB)
-
-	if txn == nil {
-		t.Fatal("New returned nil")
-	}
-}
-
-func TestGormTxn_AddWithState(t *testing.T) {
-	type state struct {
-		Id   int
-		Name string
-	}
-	db, mock, _ := sqlmock.New()
-	defer db.Close()
-
-	mock.ExpectBegin()
-	mock.ExpectExec("SELECT 1").WillReturnResult(sqlmock.NewResult(1, 1))
-	mock.ExpectCommit()
-
-	gormDB, _ := gorm.Open(postgres.New(postgres.Config{Conn: db}), &gorm.Config{})
-	txn := New(gormDB)
-	var s state
-	txn.Add(func(db *gorm.DB) error {
-		s = state{Id: 1, Name: "test"}
-		return nil
-	})
-
-	txn.Add(func(db *gorm.DB) error {
-		if s.Id != 1 || s.Name != "test" {
-			t.Fatal("State not passed between callbacks")
-		}
-		return nil
-	})
-
-	txn.Add(mockCallback)
-
-	err := txn.Transaction(context.Background())
+	db, _, err := sqlmock.New()
 	if err != nil {
-		t.Fatalf("Transaction failed: %v", err)
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
-}
-
-func TestGormTxn_Add(t *testing.T) {
-	db, _, _ := sqlmock.New()
 	defer db.Close()
 
-	gormDB, _ := gorm.Open(postgres.New(postgres.Config{Conn: db}), &gorm.Config{})
-	txn := New(gormDB)
-
-	txn.Add(mockCallback)
-	if len(txn.(*gormTxn).cbs) != 1 {
-		t.Fatal("Add did not append callback")
-	}
-}
-
-func TestGormTxn_Transaction_Success(t *testing.T) {
-	db, mock, _ := sqlmock.New()
-	defer db.Close()
-
-	mock.ExpectBegin()
-	mock.ExpectExec("SELECT 1").WillReturnResult(sqlmock.NewResult(1, 1))
-	mock.ExpectCommit()
-
-	gormDB, _ := gorm.Open(postgres.New(postgres.Config{Conn: db}), &gorm.Config{})
-	txn := New(gormDB)
-	txn.Add(mockCallback)
-
-	err := txn.Transaction(context.Background())
+	gormDB, err := gorm.Open(postgres.New(postgres.Config{
+		Conn: db,
+	}), &gorm.Config{})
 	if err != nil {
-		t.Fatalf("Transaction failed: %v", err)
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
+
+	adapter := New(gormDB)
+	assert.NotNil(t, adapter)
+	assert.IsType(t, &gormAdapter{}, adapter)
 }
 
-func TestGormTxn_Transaction_CallbackError(t *testing.T) {
-	db, mock, _ := sqlmock.New()
+func TestBegin_Success(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+	mock.ExpectBegin()
+
+	gormDB, err := gorm.Open(postgres.New(postgres.Config{
+		Conn: db,
+	}), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+
+	adapter := &gormAdapter{db: gormDB}
+	err = adapter.Begin(context.Background())
+
+	assert.Nil(t, err)
+	assert.NotNil(t, adapter.tx)
+}
+
+func TestBegin_Error(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+	mock.ExpectBegin().WillReturnError(errors.New("begin error"))
+
+	gormDB, err := gorm.Open(postgres.New(postgres.Config{
+		Conn: db,
+	}), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+
+	adapter := &gormAdapter{db: gormDB}
+	err = adapter.Begin(context.Background())
+	assert.Error(t, err)
+}
+
+func TestCommit_Success(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
 	defer db.Close()
 
 	mock.ExpectBegin()
-	mock.ExpectExec("SELECT 1").WillReturnError(errors.New("DB error"))
+	mock.ExpectCommit()
+	gormDB, err := gorm.Open(postgres.New(postgres.Config{
+		Conn: db,
+	}), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	tx := gormDB.Begin()
+	adapter := &gormAdapter{db: gormDB, tx: tx}
+	err = adapter.Commit(context.Background())
+
+	assert.NoError(t, err)
+}
+
+func TestCommit_NoTransaction(t *testing.T) {
+	db, _, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	gormDB, err := gorm.Open(postgres.New(postgres.Config{
+		Conn: db,
+	}), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+
+	adapter := &gormAdapter{db: gormDB}
+	err = adapter.Commit(context.Background())
+
+	assert.NoError(t, err)
+}
+
+func TestCommit_Error(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	mock.ExpectBegin()
+	mock.ExpectCommit().WillReturnError(errors.New("commit error"))
+	gormDB, err := gorm.Open(postgres.New(postgres.Config{
+		Conn: db,
+	}), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	tx := gormDB.Begin()
+	adapter := &gormAdapter{db: gormDB, tx: tx}
+	err = adapter.Commit(context.Background())
+
+	assert.Error(t, err)
+}
+
+func TestRollback_Success(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	mock.ExpectBegin()
 	mock.ExpectRollback()
 
-	gormDB, _ := gorm.Open(postgres.New(postgres.Config{Conn: db}), &gorm.Config{})
-	txn := New(gormDB)
-	txn.Add(mockCallback)
-
-	err := txn.Transaction(context.Background())
-	if err == nil {
-		t.Fatal("Expected Transaction to fail, but it succeeded")
+	gormDB, err := gorm.Open(postgres.New(postgres.Config{
+		Conn: db,
+	}), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
+	tx := gormDB.Begin()
+	adapter := &gormAdapter{db: gormDB, tx: tx}
+	err = adapter.Rollback(context.Background())
+
+	assert.NoError(t, err)
 }
 
-func TestGormTxn_Transaction_BeginError(t *testing.T) {
-	db, mock, _ := sqlmock.New()
+func TestRollback_NoTransaction(t *testing.T) {
+	db, _, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
 	defer db.Close()
 
-	mock.ExpectBegin().WillReturnError(errors.New("Begin error"))
-
-	gormDB, _ := gorm.Open(postgres.New(postgres.Config{Conn: db}), &gorm.Config{})
-	txn := New(gormDB)
-
-	err := txn.Transaction(context.Background())
-	if err == nil {
-		t.Fatal("Expected Transaction to fail, but it succeeded")
+	gormDB, err := gorm.Open(postgres.New(postgres.Config{
+		Conn: db,
+	}), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
+
+	adapter := &gormAdapter{db: gormDB}
+	err = adapter.Rollback(context.Background())
+
+	assert.NoError(t, err)
+}
+
+func TestRollback_Error(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	mock.ExpectBegin()
+	mock.ExpectRollback().WillReturnError(errors.New("rollback error"))
+
+	gormDB, err := gorm.Open(postgres.New(postgres.Config{
+		Conn: db,
+	}), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	tx := gormDB.Begin()
+	adapter := &gormAdapter{db: gormDB, tx: tx}
+	err = adapter.Rollback(context.Background())
+
+	assert.Error(t, err)
+}
+
+func TestEnd(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	mock.ExpectBegin()
+
+	gormDB, err := gorm.Open(postgres.New(postgres.Config{
+		Conn: db,
+	}), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	tx := gormDB.Begin()
+	adapter := &gormAdapter{db: gormDB, tx: tx}
+
+	adapter.End(context.Background())
+	assert.Nil(t, adapter.tx)
 }
