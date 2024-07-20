@@ -18,10 +18,10 @@ type mongoTxn struct {
 	opts   []*options.SessionOptions
 }
 
-// NewMongo creates a new Mongo transaction object for the given MongoDB client.
+// New creates a new Mongo transaction object for the given MongoDB client.
 // This object implements the Txn interface from 9ssi7/txn and provides the
 // necessary methods to manage transactions within MongoDB.
-func NewMongo(client *mongo.Client, opts ...*options.SessionOptions) Mongo {
+func New(client *mongo.Client, opts ...*options.SessionOptions) Mongo {
 	return &mongoTxn{
 		client: client,
 		opts:   opts,

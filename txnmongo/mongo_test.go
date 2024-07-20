@@ -11,14 +11,14 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func TestNewMongo(t *testing.T) {
+func TestNew(t *testing.T) {
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
 
 	client := mt.Client
-	txn := NewMongo(client)
+	txn := New(client)
 
 	if txn == nil {
-		t.Fatal("NewMongo returned nil")
+		t.Fatal("New returned nil")
 	}
 }
 
@@ -26,7 +26,7 @@ func TestMongoTxn_Add(t *testing.T) {
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
 
 	client := mt.Client
-	txn := NewMongo(client)
+	txn := New(client)
 
 	txn.Add(func(sc mongo.SessionContext) error { return nil })
 
@@ -40,7 +40,7 @@ func TestMongoTxn_Transaction_Success(t *testing.T) {
 
 	mt.AddMockResponses(mtest.CreateSuccessResponse(), mtest.CreateSuccessResponse())
 	client := mt.Client
-	txn := NewMongo(client)
+	txn := New(client)
 	txn.Add(func(sc mongo.SessionContext) error {
 		_, err := sc.Client().Database("test").Collection("test").InsertOne(sc, bson.E{Key: "x", Value: 1})
 		return err
@@ -57,7 +57,7 @@ func TestMongoTxn_Transaction_CallbackError(t *testing.T) {
 
 	mt.AddMockResponses(mtest.CreateSuccessResponse())
 	client := mt.Client
-	txn := NewMongo(client)
+	txn := New(client)
 
 	txn.Add(func(sc mongo.SessionContext) error {
 		return errors.New("Callback error")
@@ -76,7 +76,7 @@ func TestMongoTxn_Transaction_CommitError(t *testing.T) {
 		Code: 123,
 	}))
 	client := mt.Client
-	txn := NewMongo(client)
+	txn := New(client)
 	txn.Add(func(sc mongo.SessionContext) error {
 		_, err := sc.Client().Database("test").Collection("test").InsertOne(sc, bson.E{Key: "x", Value: 1})
 		return err
@@ -103,7 +103,7 @@ func TestMongoTxn_Transaction_StartError(t *testing.T) {
 	client := mt.Client
 	bl := true
 	bla := true
-	txn := NewMongo(client, &options.SessionOptions{
+	txn := New(client, &options.SessionOptions{
 		Snapshot:          &bl,
 		CausalConsistency: &bla,
 	})

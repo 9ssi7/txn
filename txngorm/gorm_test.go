@@ -15,15 +15,15 @@ func mockCallback(db *gorm.DB) error {
 	return db.Exec("SELECT 1").Error // Simulate a simple DB interaction
 }
 
-func TestNewGorm(t *testing.T) {
+func TestNew(t *testing.T) {
 	db, _, _ := sqlmock.New()
 	defer db.Close()
 
 	gormDB, _ := gorm.Open(postgres.New(postgres.Config{Conn: db}), &gorm.Config{})
-	txn := NewGorm(gormDB)
+	txn := New(gormDB)
 
 	if txn == nil {
-		t.Fatal("NewGorm returned nil")
+		t.Fatal("New returned nil")
 	}
 }
 
@@ -40,7 +40,7 @@ func TestGormTxn_AddWithState(t *testing.T) {
 	mock.ExpectCommit()
 
 	gormDB, _ := gorm.Open(postgres.New(postgres.Config{Conn: db}), &gorm.Config{})
-	txn := NewGorm(gormDB)
+	txn := New(gormDB)
 	var s state
 	txn.Add(func(db *gorm.DB) error {
 		s = state{Id: 1, Name: "test"}
@@ -67,7 +67,7 @@ func TestGormTxn_Add(t *testing.T) {
 	defer db.Close()
 
 	gormDB, _ := gorm.Open(postgres.New(postgres.Config{Conn: db}), &gorm.Config{})
-	txn := NewGorm(gormDB)
+	txn := New(gormDB)
 
 	txn.Add(mockCallback)
 	if len(txn.(*gormTxn).cbs) != 1 {
@@ -84,7 +84,7 @@ func TestGormTxn_Transaction_Success(t *testing.T) {
 	mock.ExpectCommit()
 
 	gormDB, _ := gorm.Open(postgres.New(postgres.Config{Conn: db}), &gorm.Config{})
-	txn := NewGorm(gormDB)
+	txn := New(gormDB)
 	txn.Add(mockCallback)
 
 	err := txn.Transaction(context.Background())
@@ -102,7 +102,7 @@ func TestGormTxn_Transaction_CallbackError(t *testing.T) {
 	mock.ExpectRollback()
 
 	gormDB, _ := gorm.Open(postgres.New(postgres.Config{Conn: db}), &gorm.Config{})
-	txn := NewGorm(gormDB)
+	txn := New(gormDB)
 	txn.Add(mockCallback)
 
 	err := txn.Transaction(context.Background())
@@ -118,7 +118,7 @@ func TestGormTxn_Transaction_BeginError(t *testing.T) {
 	mock.ExpectBegin().WillReturnError(errors.New("Begin error"))
 
 	gormDB, _ := gorm.Open(postgres.New(postgres.Config{Conn: db}), &gorm.Config{})
-	txn := NewGorm(gormDB)
+	txn := New(gormDB)
 
 	err := txn.Transaction(context.Background())
 	if err == nil {

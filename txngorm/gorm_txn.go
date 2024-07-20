@@ -15,9 +15,9 @@ type gormTxn struct {
 	cbs []txn.Callback[*gorm.DB]
 }
 
-// NewGorm creates a new Gorm transaction object for the given GORM database connection (*gorm.DB).
+// New creates a new Gorm transaction object for the given GORM database connection (*gorm.DB).
 // This object implements the Txn interface from the 9ssi7/txn package and provides all the necessary methods for transaction management with GORM.
-func NewGorm(db *gorm.DB) txn.Txn[*gorm.DB] {
+func New(db *gorm.DB) txn.Txn[*gorm.DB] {
 	return &gormTxn{
 		tx: db,
 	}

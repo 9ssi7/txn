@@ -19,60 +19,19 @@ go get github.com/9ssi7/txn
 
 ## Usage
 
-1. **Choose a Database Adapter:** Select the appropriate adapter package for your chosen database:
+1. **Before Use, Choose a Database Adapter:** Select the appropriate adapter package for your chosen database:
    * `txngorm`: For GORM (https://github.com/9ssi7/txngorm)
    * `txnmongo`: For MongoDB (https://github.com/9ssi7/txnmongo)
    * (Add more adapters as you implement them)
 
-2. **Create a TxnManager:**
-
-```go
-import (
-    "context"
-    "github.com/9ssi7/txn"
-    "[github.com/9ssi7/txngorm](https://github.com/9ssi7/txngorm)" // Or your chosen adapter
-    "gorm.io/gorm"
-)
-
-// ... (Database connection setup)
-
-repo := txngorm.NewGormRepo(db) // Use the appropriate adapter's repo
-txManager := txn.NewTxnManager[gorm.DB](repo)
-```
-
-3. **Execute Transactions:**
-
-```go
-err := txManager.Transaction(context.Background(), func(txDB *gorm.DB) error {
-    // Perform your database operations within this transaction
-    // ...
-    return nil // Return nil on success, or an error to trigger rollback
-})
-
-if err != nil {
-    // Handle the transaction error
-}
-```
-
 
 ## Example (Using txngorm)
 
-```go
-// ... (assuming you have a User model and a GormRepo)
+This example in the `examples` directory demonstrates how to use the `txn` package with GORM.
 
-func UpdateUserWithTransaction(ctx context.Context, db *gorm.DB, userID uint, updates map[string]interface{}) error {
-    repo := txngorm.NewGormRepo(db)
-    txManager := txn.NewTxnManager[gorm.DB](repo)
+Included examples:
 
-    return txManager.Transaction(ctx, func(txDB *gorm.DB) error {
-        // Transactions are performed safely here
-        if err := txDB.Model(&User{ID: userID}).Updates(updates).Error; err != nil {
-            return err
-        }
-        return nil // Return nil if there is no error
-    })
-}
-```
+- [`Basic Gorm Example`](examples/basic-gorm/main.go): Demonstrates basic usage of the `txn` package with GORM.
 
 ## Contributing
 

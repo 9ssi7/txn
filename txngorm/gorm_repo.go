@@ -7,6 +7,8 @@ import (
 	"gorm.io/gorm"
 )
 
+type Txr *gorm.DB
+
 type txnRepo struct {
 	tx *gorm.DB
 	db *gorm.DB
