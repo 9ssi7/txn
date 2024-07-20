@@ -1,4 +1,4 @@
-package gormadapter
+package txngorm
 
 import (
 	"context"
