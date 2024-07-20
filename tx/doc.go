@@ -1,4 +1,4 @@
-// Copyright 2024 The txn Authors
+// Copyright 2024 The tx Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,4 +23,4 @@
 //   - Adapter: An interface that defines the contract for interacting with a specific
 //     data source within a transaction. Each adapter is responsible for implementing
 //     the necessary operations (begin, commit, rollback) for its respective data source.
-package txn
+package tx

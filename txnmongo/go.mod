@@ -2,10 +2,10 @@ module github.com/9ssi7/txn/txnmongo
 
 go 1.22.0
 
-replace github.com/9ssi7/txn => ../
+replace github.com/9ssi7/txn/tx => ../tx
 
 require (
-	github.com/9ssi7/txn v0.0.0-00010101000000-000000000000
+	github.com/9ssi7/txn/tx v0.0.0-00010101000000-000000000000
 	github.com/stretchr/testify v1.9.0
 	go.mongodb.org/mongo-driver v1.16.0
 )

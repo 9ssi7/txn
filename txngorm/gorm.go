@@ -3,14 +3,14 @@ package txngorm
 import (
 	"context"
 
-	"github.com/9ssi7/txn"
+	"github.com/9ssi7/txn/tx"
 	"gorm.io/gorm"
 )
 
 // GAdapter is the interface for interacting with GORM within a transaction.
 // It extends the txn.Adapter interface to provide additional GORM-specific functionality.
 type GAdapter interface {
-	txn.Adapter
+	tx.Adapter
 
 	// GetCurrent returns the current *gorm.DB instance to use for executing GORM operations.
 	// Depending on the transaction state, this may be the original db instance or a transaction object.

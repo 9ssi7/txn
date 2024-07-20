@@ -3,7 +3,7 @@ package txnmongo
 import (
 	"context"
 
-	"github.com/9ssi7/txn"
+	"github.com/9ssi7/txn/tx"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -11,7 +11,7 @@ import (
 // MAdapter is the interface for interacting with MongoDB within a transaction.
 // It extends the txn.Adapter interface to provide additional MongoDB-specific functionality.
 type MAdapter interface {
-	txn.Adapter
+	tx.Adapter
 
 	// GetCurrent returns the current context.Context to use for executing MongoDB commands.
 	// Depending on the transaction state, this may be the original context or a

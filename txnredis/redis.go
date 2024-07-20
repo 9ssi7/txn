@@ -3,14 +3,14 @@ package txnredis
 import (
 	"context"
 
-	"github.com/9ssi7/txn"
+	"github.com/9ssi7/txn/tx"
 	"github.com/redis/go-redis/v9"
 )
 
 // RAdapter is the interface for interacting with Redis within a transaction.
 // It extends the txn.Adapter interface to provide additional Redis-specific functionality.
 type RAdapter interface {
-	txn.Adapter
+	tx.Adapter
 
 	// GetCurrent returns the current redis.Cmdable instance to use for executing Redis commands.
 	// Depending on the transaction state, this may be the underlying redis.Client or a redis.Pipeliner.
