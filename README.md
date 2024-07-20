@@ -35,9 +35,6 @@ tx.Register(gormAdapter)
 mongoAdapter := txnmongo.New(mongoClient)
 tx.Register(mongoAdapter)
 
-redisAdapter := txnredis.New(redisClient)
-tx.Register(redisAdapter)
-
 // Register more adapters as needed...
 ```
 
@@ -63,9 +60,8 @@ if err := tx.Commit(context.Background()); err != nil {
 
 The `txn` package supports multiple database adapters:
 
-* **txngorm:** GORM (https://github.com/9ssi7/txngorm)
-* **txnmongo:** MongoDB (https://github.com/9ssi7/txnmongo)
-* **txnredis:** Redis (https://github.com/9ssi7/txnredis)
+* **txngorm:** GORM (./txngorm)
+* **txnmongo:** MongoDB (./txnmongo)
 
 ## Contributing
 
