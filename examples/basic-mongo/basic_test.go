@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/9ssi7/txnmongo"
+	"github.com/9ssi7/txn/txnmongo"
 	"go.mongodb.org/mongo-driver/mongo/integration/mtest"
 )
 

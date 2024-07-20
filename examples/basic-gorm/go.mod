@@ -2,13 +2,13 @@ module github.com/9ssi7/txn/examples/basic-gorm
 
 replace github.com/9ssi7/txn => ../..
 
-replace github.com/9ssi7/txngorm => ../../txngorm
+replace github.com/9ssi7/txn/txngorm => ../../txngorm
 
 go 1.22.0
 
 require (
 	github.com/9ssi7/txn v0.0.0-00010101000000-000000000000
-	github.com/9ssi7/txngorm v0.0.0-00010101000000-000000000000
+	github.com/9ssi7/txn/txngorm v0.0.0-00010101000000-000000000000
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	gorm.io/driver/postgres v1.5.9
 	gorm.io/gorm v1.25.11

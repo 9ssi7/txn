@@ -2,13 +2,13 @@ module github.com/9ssi7/txn/examples/basic-mongo
 
 replace github.com/9ssi7/txn => ../..
 
-replace github.com/9ssi7/txnmongo => ../../txnmongo
+replace github.com/9ssi7/txn/txnmongo => ../../txnmongo
 
 go 1.22.0
 
 require (
 	github.com/9ssi7/txn v0.0.0-00010101000000-000000000000
-	github.com/9ssi7/txnmongo v0.0.0-00010101000000-000000000000
+	github.com/9ssi7/txn/txnmongo v0.0.0-00010101000000-000000000000
 	go.mongodb.org/mongo-driver v1.16.0
 )
 

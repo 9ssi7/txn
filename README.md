@@ -20,8 +20,8 @@ go get github.com/9ssi7/txn
 ## Usage
 
 1. **Before Use, Choose a Database Adapter:** Select the appropriate adapter package for your chosen database:
-   * `txngorm`: For GORM (https://github.com/9ssi7/txngorm)
-   * `txnmongo`: For MongoDB (https://github.com/9ssi7/txnmongo)
+   * `txngorm`: For GORM (https://github.com/9ssi7/txn/txngorm)
+   * `txnmongo`: For MongoDB (https://github.com/9ssi7/txn/txnmongo)
    * (Add more adapters as you implement them)
 
 

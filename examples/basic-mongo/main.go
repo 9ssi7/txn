@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/9ssi7/txn"
-	"github.com/9ssi7/txnmongo"
+	"github.com/9ssi7/txn/txnmongo"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 

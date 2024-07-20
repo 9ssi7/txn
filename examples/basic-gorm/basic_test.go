@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/9ssi7/txngorm"
+	"github.com/9ssi7/txn/txngorm"
 	"github.com/DATA-DOG/go-sqlmock"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

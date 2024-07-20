@@ -1,4 +1,4 @@
-module github.com/9ssi7/txngorm
+module github.com/9ssi7/txn/txngorm
 
 go 1.22.0
 

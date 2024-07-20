@@ -1,4 +1,4 @@
-module github.com/9ssi7/txnmongo
+module github.com/9ssi7/txn/txnmongo
 
 go 1.22.0
 
