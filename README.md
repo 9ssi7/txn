@@ -17,7 +17,10 @@ The `txn` package provides a robust and flexible framework for managing distribu
 ## Installation
 
 ```bash
-go get github.com/9ssi7/txn/tx
+go get github.com/9ssi7/txn
+
+go get github.com/9ssi7/txn/txngorm // For GORM Adapter
+go get github.com/9ssi7/txn/txnmongo // For MongoDB Adapter
 ```
 
 ## Usage
