@@ -9,7 +9,7 @@ The `txn` package provides a robust and flexible framework for managing distribu
 ## Key Features
 
 * **Distributed Transactions:** Coordinate transactions across multiple data sources seamlessly.
-* **Database Independence:** Work with various databases (PostgreSQL, MongoDB, Redis, etc.) using specialized adapters.
+* **Database Independence:** Work with various databases (PostgreSQL, MongoDB etc.) using specialized adapters.
 * **Clean Architecture:** Maintain a clear separation of concerns, keeping your business logic decoupled from data access details.
 * **Atomicity:** Ensure that all operations within a transaction either succeed or fail together, maintaining data integrity.
 * **Flexibility:** Easily extend the framework by creating custom adapters for your specific data sources.
@@ -65,8 +65,8 @@ if err := tx.Commit(context.Background()); err != nil {
 
 The `txn` package supports multiple database adapters:
 
-* **txngorm:** GORM (./txngorm)
-* **txnmongo:** MongoDB (./txnmongo)
+* **txngorm:** [GORM](./txngorm) 
+* **txnmongo:** [MongoDB](./txnmongo)
 
 ## Contributing
 
