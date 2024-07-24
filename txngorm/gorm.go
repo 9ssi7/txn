@@ -64,5 +64,5 @@ func (a *gormAdapter) GetCurrent(ctx context.Context) *gorm.DB {
 	if a.tx != nil {
 		return a.tx
 	}
-	return a.db
+	return a.db.WithContext(ctx)
 }

@@ -3,7 +3,7 @@ module github.com/9ssi7/txn/txnmongo
 go 1.22.0
 
 require (
-	github.com/9ssi7/txn v1.0.0
+	github.com/9ssi7/txn v1.0.1
 	github.com/stretchr/testify v1.9.0
 	go.mongodb.org/mongo-driver v1.16.0
 )
