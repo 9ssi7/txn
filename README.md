@@ -4,7 +4,7 @@
 
 The `txn` package provides a robust and flexible framework for managing distributed transactions across multiple data sources in your Go applications. By harnessing the power of Go generics, `txn` enables a clean, database-agnostic approach to transaction handling, ensuring data consistency and atomicity even in complex, distributed environments.
 
-## Before of all, Check the [Real World Example](https://github.com/9ssi7/teknasyon.banking/blob/main/apps/banking/internal/app/commands/money_transfer.go#L37)
+## Before of all, Check the [Real World Example](https://github.com/9ssi7/teknasyon.banking/blob/main/apps/banking/internal/app/commands/money_transfer.go#L41)
 
 ## Key Features
 
