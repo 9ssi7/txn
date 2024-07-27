@@ -1,6 +1,9 @@
 # txn: Generic Distributed Transaction Management for Go
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![GoDoc](https://godoc.org/github.com/9ssi7/txn?status.svg)](https://pkg.go.dev/github.com/9ssi7/txn)
+![Project status](https://img.shields.io/badge/version-1.0.2-green.svg)
+[![Go Report Card](https://goreportcard.com/badge/github.com/9ssi7/txn)](https://goreportcard.com/report/github.com/9ssi7/txn)
 
 The `txn` package provides a robust and flexible framework for managing distributed transactions across multiple data sources in your Go applications. By harnessing the power of Go generics, `txn` enables a clean, database-agnostic approach to transaction handling, ensuring data consistency and atomicity even in complex, distributed environments.
 
