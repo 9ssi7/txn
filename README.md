@@ -21,6 +21,7 @@ go get github.com/9ssi7/txn
 
 go get github.com/9ssi7/txn/txngorm // For GORM Adapter
 go get github.com/9ssi7/txn/txnmongo // For MongoDB Adapter
+go get github.com/9ssi7/txn/txnsql // For Native SQL Adapter
 ```
 
 ## Usage
@@ -39,6 +40,9 @@ tx.Register(gormAdapter)
 
 mongoAdapter := txnmongo.New(mongoClient)
 tx.Register(mongoAdapter)
+
+sqlAdapter := txnsql.New(sqlDB)
+tx.Register(sqlAdapter)
 
 // Register more adapters as needed...
 ```
@@ -67,6 +71,7 @@ The `txn` package supports multiple database adapters:
 
 * **txngorm:** [GORM](./txngorm) 
 * **txnmongo:** [MongoDB](./txnmongo)
+* **txnsql:** [Native SQL](./txnsql)
 
 ## Contributing
 
