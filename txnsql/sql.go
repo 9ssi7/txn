@@ -12,8 +12,8 @@ import (
 type SqlAdapter interface {
 	txn.Adapter
 
-	// IsTx returns true if the current transaction is active.
-	IsTx() bool
+	// Returns current transaction if it exists.
+	Tx() *sql.Tx
 }
 
 // New creates a new SqlAdapter instance using the provided *sql.DB.
@@ -59,6 +59,6 @@ func (a *sqlAdapter) End(_ context.Context) {
 	}
 }
 
-func (a *sqlAdapter) IsTx() bool {
-	return a.tx != nil
+func (a *sqlAdapter) Tx() *sql.Tx {
+	return a.tx
 }
