@@ -141,23 +141,23 @@ func TestSqlAdapter_End(t *testing.T) {
 	})
 }
 
-func TestSqlAdapter_IsTx(t *testing.T) {
+func TestSqlAdapter_Tx(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 	defer db.Close()
 
-	t.Run("IsTx true", func(t *testing.T) {
+	t.Run("Tx is not nil", func(t *testing.T) {
 		adapter := &sqlAdapter{db: db}
 		mock.ExpectBegin()
 
 		adapter.Begin(context.Background())
-		assert.True(t, adapter.IsTx())
+		assert.True(t, adapter.Tx() != nil)
 	})
 
-	t.Run("IsTx false", func(t *testing.T) {
+	t.Run("Tx is nil", func(t *testing.T) {
 		adapter := &sqlAdapter{db: db}
-		assert.False(t, adapter.IsTx())
+		assert.True(t, adapter.Tx() == nil)
 	})
 }
