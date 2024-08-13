@@ -7,13 +7,24 @@ import (
 	"github.com/9ssi7/txn"
 )
 
+type SqlDbTx interface {
+	PrepareContext(ctx context.Context, query string) (*sql.Stmt, error)
+	Prepare(query string) (*sql.Stmt, error)
+	ExecContext(ctx context.Context, query string, args ...any) (sql.Result, error)
+	Exec(query string, args ...any) (sql.Result, error)
+	QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error)
+	Query(query string, args ...any) (*sql.Rows, error)
+	QueryRowContext(ctx context.Context, query string, args ...any) *sql.Row
+	QueryRow(query string, args ...any) *sql.Row
+}
+
 // SqlAdapter is the interface for interacting with SQL databases within a transaction.
 // It extends the txn.Adapter interface to provide additional SQL-specific functionality.
 type SqlAdapter interface {
 	txn.Adapter
 
 	// Returns current transaction if it exists.
-	Tx() *sql.Tx
+	GetCurrent() SqlDbTx
 }
 
 // New creates a new SqlAdapter instance using the provided *sql.DB.
@@ -59,6 +70,9 @@ func (a *sqlAdapter) End(_ context.Context) {
 	}
 }
 
-func (a *sqlAdapter) Tx() *sql.Tx {
+func (a *sqlAdapter) GetCurrent() SqlDbTx {
+	if a.tx == nil {
+		return a.db
+	}
 	return a.tx
 }
