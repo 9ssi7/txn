@@ -19,3 +19,10 @@ type Adapter interface {
 	// It's called regardless of whether the transaction was committed or rolled back.
 	End(ctx context.Context)
 }
+
+// Repo is an interface that represents a repository for managing transactions.
+type Repo interface {
+	// Register registers an adapter for a specific data source to participate
+	// in the transaction.
+	Adapter() Adapter
+}

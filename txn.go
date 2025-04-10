@@ -20,7 +20,7 @@ type Tx interface {
 
 	// Register registers an adapter for a specific data source to participate
 	// in the transaction.
-	Register(Adapter)
+	Register(...Adapter) Tx
 }
 
 // New creates a new Tx instance.
@@ -32,8 +32,9 @@ type txn struct {
 	adapters []Adapter
 }
 
-func (t *txn) Register(a Adapter) {
-	t.adapters = append(t.adapters, a)
+func (t *txn) Register(a ...Adapter) Tx {
+	t.adapters = append(t.adapters, a...)
+	return t
 }
 
 func (t *txn) Cancel(ctx context.Context) {

@@ -1,6 +1,5 @@
 # txn: Generic Distributed Transaction Management for Go
 
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![GoDoc](https://godoc.org/github.com/9ssi7/txn?status.svg)](https://pkg.go.dev/github.com/9ssi7/txn)
 ![Project status](https://img.shields.io/badge/version-1.0.2-green.svg)
 [![Go Report Card](https://goreportcard.com/badge/github.com/9ssi7/txn)](https://goreportcard.com/report/github.com/9ssi7/txn)
@@ -12,10 +11,12 @@ The `txn` package provides a robust and flexible framework for managing distribu
 ## Key Features
 
 * **Distributed Transactions:** Coordinate transactions across multiple data sources seamlessly.
-* **Database Independence:** Work with various databases (PostgreSQL, MongoDB etc.) using specialized adapters.
 * **Clean Architecture:** Maintain a clear separation of concerns, keeping your business logic decoupled from data access details.
 * **Atomicity:** Ensure that all operations within a transaction either succeed or fail together, maintaining data integrity.
 * **Flexibility:** Easily extend the framework by creating custom adapters for your specific data sources.
+
+Note:
+Database independency not possible with this package. You need to use the same database for all adapters. For example, if you are using GORM, you need to use GORM for all adapters. If you are using MongoDB, you need to use MongoDB for all adapters. If GORM throws an error but MongoDB doesn't, you need to handle it yourself. This package doesn't handle that. It only provides a way to manage transactions across multiple data sources.
 
 ## Installation
 
@@ -38,14 +39,7 @@ tx := txn.New()
 2. **Register Adapters:**
 
 ```go
-gormAdapter := txngorm.New(gormDB)
-tx.Register(gormAdapter)
-
-mongoAdapter := txnmongo.New(mongoClient)
-tx.Register(mongoAdapter)
-
-sqlAdapter := txnsql.New(sqlDB)
-tx.Register(sqlAdapter)
+tx.Register(txngorm.New(gormDB), txnmongo.New(mongoClient), txnsql.New(sqlDB))
 
 // Register more adapters as needed...
 ```
@@ -53,19 +47,25 @@ tx.Register(sqlAdapter)
 3. **Manage Transactions:**
 
 ```go
-err := tx.Begin(context.Background())
-if err != nil {
-    // Handle error
-}
-defer tx.End(context.Background()) // Ensure resources are cleaned up
+func transaction() (err error) {
+    defer func() {
+        if err != nil {
+            tx.Rollback(context.Background())
+        }
+    }()
+    if err := tx.Begin(context.Background()); err != nil {
+        return err
+    }
+    // Perform operations on each data source using their respective adapters
+    // ...
 
-// Perform operations on each data source using their respective adapters
-// ...
-
-if err := tx.Commit(context.Background()); err != nil {
-   tx.Rollback(context.Background())
-    // Handle commit error
+    if err := tx.Commit(context.Background()); err != nil {
+    return err
+    }
+    return nil
 }
+
+
 ```
 
 ## Adapters
@@ -82,4 +82,4 @@ Contributions are welcome! Please feel free to submit issues, bug reports, or pu
 
 ## License
 
-This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
