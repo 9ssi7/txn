@@ -1,3 +1,6 @@
+> [!CAUTION]
+> We highly recommend use [stx](https://github.com/restayway/stx) instead of txn
+
 # txn: Generic Distributed Transaction Management for Go
 
 [![GoDoc](https://godoc.org/github.com/9ssi7/txn?status.svg)](https://pkg.go.dev/github.com/9ssi7/txn)
